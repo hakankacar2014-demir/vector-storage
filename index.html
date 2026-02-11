@@ -2,22 +2,25 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Free Vector Stock | Gallery</title>
+    <title>Free Vector Stock | Fixed Download</title>
     <style>
-        body { background: #000; color: #fff; font-family: sans-serif; text-align: center; margin: 0; padding: 20px; }
-        h1 { color: #f39c12; text-transform: uppercase; margin-top: 30px; }
-        .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; padding: 20px; max-width: 1200px; margin: 0 auto; }
+        body { background: #000; color: #fff; font-family: sans-serif; text-align: center; padding: 20px; }
+        .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
         .card { background: #111; border: 1px solid #222; padding: 15px; border-radius: 10px; }
         .card img { width: 100%; height: 160px; object-fit: contain; background: #080808; border-radius: 5px; }
-        .btn { background: #f39c12; color: #000; padding: 10px; text-decoration: none; display: block; margin-top: 15px; border-radius: 5px; font-weight: bold; }
+        .btn { background: #f39c12; color: #000; padding: 12px; border: none; width: 100%; margin-top: 15px; border-radius: 5px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
     <h1>FREE VECTOR STOCK</h1>
     <div id="gallery" class="gallery">Loading designs...</div>
+
     <script>
+        const OWNER = 'free-vector-stock';
+        const REPO = 'free-vector-stock';
+
         async function load() {
-            const res = await fetch('https://api.github.com/repos/free-vector-stock/free-vector-stock/contents/vectors');
+            const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/vectors`);
             const dirs = await res.json();
             const gallery = document.getElementById('gallery');
             gallery.innerHTML = '';
@@ -30,13 +33,24 @@
                     if(jpg && eps) {
                         gallery.innerHTML += `<div class="card">
                             <img src="${jpg.download_url}">
-                            <p style="color:#f39c12">${d.name.replace(/-/g, ' ')}</p>
-                            <a href="${eps.download_url}" class="btn" download>DOWNLOAD EPS</a>
+                            <p style="color:#f39c12; text-transform:uppercase; font-size:12px;">${d.name.replace(/-/g, ' ')}</p>
+                            <button class="btn" onclick="forceDownload('${eps.download_url}', '${d.name}.eps')">DOWNLOAD EPS</button>
                         </div>`;
                     }
                 }
             }
         }
+
+        // Bu fonksiyon dosyanın kod olarak açılmasını engeller, doğrudan indirir
+        async function forceDownload(url, filename) {
+            const response = await fetch(url);
+            const blob = await response.blob();
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = filename;
+            link.click();
+        }
+
         load();
     </script>
 </body>
