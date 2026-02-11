@@ -2,57 +2,45 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Free Vector Stock | Download Premium Vectors</title>
+    <title>Free Vector Stock</title>
     <style>
-        body { background: #000; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; padding: 20px; margin: 0; }
-        h1 { color: #f39c12; margin-top: 30px; text-transform: uppercase; font-size: 2.5rem; letter-spacing: 2px; }
+        body { background: #000; color: #fff; font-family: sans-serif; text-align: center; padding: 20px; margin: 0; }
+        h1 { color: #f39c12; margin-top: 30px; text-transform: uppercase; }
         
-        /* SEARCH BAR */
-        .search-container { margin: 30px auto; max-width: 600px; }
+        .search-container { margin: 20px auto; max-width: 500px; }
         #searchInput { 
-            width: 100%; padding: 15px 25px; border-radius: 30px; border: 2px solid #333; 
-            background: #111; color: #fff; outline: none; transition: 0.3s; font-size: 1rem;
+            width: 100%; padding: 12px 20px; border-radius: 25px; border: 2px solid #333; 
+            background: #111; color: #fff; outline: none; box-sizing: border-box;
         }
-        #searchInput:focus { border-color: #f39c12; box-shadow: 0 0 10px rgba(243, 156, 18, 0.3); }
 
-        /* GALLERY GRID */
         .gallery { 
             display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
-            gap: 30px; padding: 20px; max-width: 1400px; margin: 0 auto;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); 
+            gap: 25px; padding: 20px; max-width: 1400px; margin: 0 auto;
         }
         
         .card { 
-            background: #111; border: 1px solid #222; padding: 20px; border-radius: 15px; 
+            background: #111; border: 1px solid #222; padding: 15px; border-radius: 12px; 
             display: flex; flex-direction: column; align-items: center; justify-content: space-between;
-            min-height: 350px; transition: 0.3s;
+            min-height: 340px;
         }
-        .card:hover { border-color: #f39c12; transform: translateY(-8px); }
 
-        /* IMAGE AREA - Your requested sizes */
         .img-container {
             display: flex; align-items: center; justify-content: center;
             width: 240px; height: 160px; 
-            background: #080808; border-radius: 10px; overflow: hidden;
+            background: #080808; border-radius: 8px; overflow: hidden;
         }
 
-        .card img { 
-            object-fit: contain; 
-            display: block;
-            transition: 0.4s;
-        }
+        .card img { object-fit: contain; display: block; }
+        .card-title { margin: 15px 0; font-size: 13px; font-weight: bold; color: #f39c12; text-transform: uppercase; }
 
-        .card-title { margin: 15px 0; font-size: 14px; font-weight: 600; color: #f39c12; text-transform: uppercase; }
-
-        /* DOWNLOAD BUTTON */
+        /* BUTON BURADA İNGİLİZCE OLDU */
         .download-btn { 
             background: #f39c12; color: #000; padding: 12px; text-decoration: none; 
-            font-weight: bold; border-radius: 8px; font-size: 14px;
+            font-weight: bold; border-radius: 6px; font-size: 13px;
             border: none; width: 100%; cursor: pointer; transition: 0.2s;
-            text-transform: uppercase;
         }
-        .download-btn:hover { background: #fff; transform: scale(1.02); }
+        .download-btn:hover { background: #fff; }
     </style>
 </head>
 <body>
@@ -63,7 +51,7 @@
         <input type="text" id="searchInput" placeholder="Search vectors..." onkeyup="search()">
     </div>
 
-    <div id="gallery" class="gallery">Loading assets...</div>
+    <div id="gallery" class="gallery">Loading...</div>
 
     <script>
         const OWNER = 'free-vector-stock';
@@ -97,17 +85,14 @@
                         }
                     }
                 }
-            } catch(e) { gallery.innerHTML = 'Error: Could not load assets.'; }
+            } catch(e) { gallery.innerHTML = 'Error loading assets.'; }
         }
 
         function applyDynamicSize(img) {
-            const isPortrait = img.naturalHeight > img.naturalWidth;
-            if (isPortrait) {
-                // Your requested vertical size
+            if (img.naturalHeight > img.naturalWidth) {
                 img.style.width = "107px";
                 img.style.height = "160px";
             } else {
-                // Your requested horizontal size
                 img.style.width = "240px";
                 img.style.height = "160px";
             }
