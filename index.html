@@ -3,37 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Free Vector Stock | Pro Edition</title>
+    <title>Free Vector Stock | Fixed Edition</title>
     <style>
-        body { background: #000; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; margin: 0; padding: 20px; }
-        h1 { color: #f39c12; text-transform: uppercase; margin-top: 20px; font-size: 26px; letter-spacing: 3px; font-weight: 800; }
-        
-        /* Arama Çubuğu */
-        .search-container { margin: 30px auto; max-width: 650px; position: relative; }
-        #searchInput { width: 100%; padding: 16px 25px; border-radius: 50px; border: 2px solid #222; background: #111; color: #fff; font-size: 16px; outline: none; transition: 0.3s; box-sizing: border-box; }
-        #searchInput:focus { border-color: #f39c12; box-shadow: 0 0 15px rgba(243, 156, 18, 0.3); }
-
-        /* Galeri Izgarası */
-        .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 30px; padding: 20px; max-width: 1400px; margin: 0 auto; min-height: 400px; }
-        .card { background: #0a0a0a; border: 1px solid #1a1a1a; padding: 18px; border-radius: 15px; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.3s ease; }
-        .card:hover { transform: translateY(-8px); border-color: #f39c12; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
-        
-        /* Görsel Alanı */
-        .img-container { width: 100%; height: 180px; background: #050505; border-radius: 10px; overflow: hidden; display: flex; align-items: center; justify-content: center; margin-bottom: 15px; }
-        .card img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        
-        .card-title { color: #f39c12; font-size: 13px; margin-bottom: 15px; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; min-height: 32px; display: flex; align-items: center; justify-content: center; }
-        
-        .btn { background: #f39c12; color: #000; padding: 14px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; text-decoration: none; font-size: 13px; transition: 0.2s; text-transform: uppercase; }
-        .btn:hover { background: #ffb133; transform: scale(1.02); }
-
-        /* Sayfalama */
-        .pagination { margin: 50px 0; display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
-        .page-btn { background: #111; color: #f39c12; border: 1px solid #333; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
-        .page-btn:hover { background: #222; border-color: #f39c12; }
-        .page-btn.active { background: #f39c12; color: #000; border-color: #f39c12; box-shadow: 0 0 10px rgba(243, 156, 18, 0.4); }
-        
-        #loadingMsg { font-size: 18px; color: #f39c12; margin-top: 100px; font-weight: bold; }
+        body { background: #000; color: #fff; font-family: 'Segoe UI', sans-serif; text-align: center; margin: 0; padding: 20px; }
+        h1 { color: #f39c12; text-transform: uppercase; margin: 25px 0; font-size: 26px; letter-spacing: 2px; }
+        .search-container { margin-bottom: 30px; }
+        #searchInput { width: 90%; max-width: 600px; padding: 15px 25px; border-radius: 30px; border: 2px solid #222; background: #111; color: #fff; font-size: 16px; outline: none; transition: 0.3s; }
+        #searchInput:focus { border-color: #f39c12; }
+        .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; max-width: 1300px; margin: 0 auto; }
+        .card { background: #0a0a0a; border: 1px solid #1a1a1a; padding: 20px; border-radius: 15px; display: flex; flex-direction: column; transition: 0.3s; }
+        .card:hover { transform: translateY(-5px); border-color: #f39c12; }
+        .img-box { width: 100%; height: 180px; background: #050505; border-radius: 10px; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-bottom: 15px; }
+        .img-box img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .card-title { color: #f39c12; font-size: 13px; font-weight: bold; margin-bottom: 15px; text-transform: uppercase; min-height: 35px; display: flex; align-items: center; justify-content: center; }
+        .btn { background: #f39c12; color: #000; padding: 12px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 12px; transition: 0.2s; }
+        .btn:hover { background: #ffb133; }
+        .pagination { margin: 50px 0; display: flex; justify-content: center; gap: 10px; }
+        .page-btn { background: #111; color: #fff; border: 1px solid #333; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .page-btn.active { background: #f39c12; color: #000; border-color: #f39c12; }
     </style>
 </head>
 <body>
@@ -41,116 +28,92 @@
     <h1>FREE VECTOR STOCK</h1>
 
     <div class="search-container">
-        <input type="text" id="searchInput" placeholder="Search by name (e.g. fast food, burger...)" onkeyup="handleSearch()">
+        <input type="text" id="searchInput" placeholder="Search vectors..." onkeyup="doSearch()">
     </div>
 
-    <div id="loadingMsg">Loading Database...</div>
-    <div id="gallery" class="gallery"></div>
+    <div id="gallery" class="gallery">Loading...</div>
     <div id="pagination" class="pagination"></div>
 
     <script>
         const OWNER = 'free-vector-stock';
         const REPO = 'free-vector-stock';
-        const ITEMS_PER_PAGE = 12;
+        const PER_PAGE = 12;
 
-        let allFolders = [];
-        let filteredFolders = [];
-        let currentPage = 1;
+        let allData = [];
+        let filteredData = [];
+        let curPage = 1;
 
-        async function init() {
+        async function start() {
             try {
-                // vectors.json'u çekiyoruz
-                const response = await fetch('vectors.json?v=' + Date.now());
-                if (!response.ok) throw new Error();
-                allFolders = await response.json();
-                
-                // En son yüklenenler en başta görünsün
-                allFolders.reverse(); 
-                filteredFolders = [...allFolders];
-
-                document.getElementById('loadingMsg').style.display = 'none';
-                renderPage(1);
-            } catch (error) {
-                document.getElementById('loadingMsg').innerText = "Database Error! Please check vectors.json file.";
-            }
+                const r = await fetch('vectors.json?t=' + Date.now());
+                allData = await r.json();
+                allData.reverse();
+                filteredData = [...allData];
+                showPage(1);
+            } catch (e) { document.getElementById('gallery').innerText = "JSON Error!"; }
         }
 
-        function renderPage(page) {
-            currentPage = page;
-            const gallery = document.getElementById('gallery');
-            gallery.innerHTML = '';
+        function showPage(p) {
+            curPage = p;
+            const gal = document.getElementById('gallery');
+            gal.innerHTML = '';
             
-            const start = (page - 1) * ITEMS_PER_PAGE;
-            const end = start + ITEMS_PER_PAGE;
-            const itemsToShow = filteredFolders.slice(start, end);
+            const startIdx = (p - 1) * PER_PAGE;
+            const items = filteredData.slice(startIdx, startIdx + PER_PAGE);
 
-            if (itemsToShow.length === 0) {
-                gallery.innerHTML = '<div style="grid-column: 1/-1; font-size: 20px; color: #555;">No results found.</div>';
-                document.getElementById('pagination').innerHTML = '';
-                return;
-            }
-
-            itemsToShow.forEach(name => {
-                // Karakter sorunlarını (parantez, boşluk) çözmek için encode ediyoruz
-                const safeName = encodeURIComponent(name);
-                const jpgUrl = `https://raw.githubusercontent.com/${OWNER}/${REPO}/main/vectors/${safeName}/${safeName}.jpg`;
-                const epsUrl = `https://raw.githubusercontent.com/${OWNER}/${REPO}/main/vectors/${safeName}/${safeName}.eps`;
+            items.forEach(folderName => {
+                // Parantez gibi özel karakterleri tarayıcıya uygun hale getiriyoruz
+                const encName = encodeURIComponent(folderName);
+                // jsDelivr CDN kullanarak hızı artırıyoruz
+                const imgPath = `https://cdn.jsdelivr.net/gh/${OWNER}/${REPO}/vectors/${encName}/${encName}.jpg`;
+                const epsPath = `https://raw.githubusercontent.com/${OWNER}/${REPO}/main/vectors/${encName}/${encName}.eps`;
 
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.innerHTML = `
-                    <div class="img-container">
-                        <img src="${jpgUrl}" onerror="this.src='https://via.placeholder.com/300x200/111/f39c12?text=Preview+Loading...'">
+                    <div class="img-box">
+                        <img src="${imgPath}" onerror="this.src='https://via.placeholder.com/300x200/111/f39c12?text=Image+Not+Ready'">
                     </div>
-                    <div class="card-title">${name.replace(/-/g, ' ')}</div>
-                    <button class="btn" onclick="downloadFile('${epsUrl}', '${name}.eps')">DOWNLOAD EPS</button>
+                    <div class="card-title">${folderName.replace(/-/g, ' ')}</div>
+                    <button class="btn" onclick="downloadEps('${epsPath}', '${folderName}.eps')">DOWNLOAD EPS</button>
                 `;
-                gallery.appendChild(card);
+                gal.appendChild(card);
             });
-
-            renderPagination();
+            drawPagination();
         }
 
-        function handleSearch() {
-            const query = document.getElementById('searchInput').value.toLowerCase().trim();
-            filteredFolders = allFolders.filter(f => f.toLowerCase().replace(/-/g, ' ').includes(query));
-            renderPage(1);
+        function doSearch() {
+            const q = document.getElementById('searchInput').value.toLowerCase();
+            filteredData = allData.filter(x => x.toLowerCase().includes(q));
+            showPage(1);
         }
 
-        function renderPagination() {
-            const container = document.getElementById('pagination');
-            const totalPages = Math.ceil(filteredFolders.length / ITEMS_PER_PAGE);
-            container.innerHTML = '';
-
-            if (totalPages <= 1) return;
-
-            // Maksimum 5 sayfa butonu göster (çok fazla sayfa olursa taşmasın)
-            for (let i = 1; i <= totalPages; i++) {
-                const btn = document.createElement('button');
-                btn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
-                btn.innerText = i;
-                btn.onclick = () => {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                    renderPage(i);
-                };
-                container.appendChild(btn);
+        function drawPagination() {
+            const pag = document.getElementById('pagination');
+            const total = Math.ceil(filteredData.length / PER_PAGE);
+            pag.innerHTML = '';
+            if(total <= 1) return;
+            for(let i=1; i<=total; i++) {
+                const b = document.createElement('button');
+                b.className = `page-btn ${i === curPage ? 'active' : ''}`;
+                b.innerText = i;
+                b.onclick = () => { window.scrollTo(0,0); showPage(i); };
+                pag.appendChild(b);
             }
         }
 
-        async function downloadFile(url, filename) {
+        async function downloadEps(url, name) {
             try {
-                const response = await fetch(url);
-                const blob = await response.blob();
-                const link = document.createElement('a');
-                link.href = window.URL.createObjectURL(blob);
-                link.download = filename;
-                link.click();
-            } catch (e) {
-                alert("Download failed. The file might still be uploading to GitHub.");
-            }
+                const r = await fetch(url);
+                const b = await r.blob();
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(b);
+                a.download = name;
+                a.click();
+            } catch (e) { alert("Download failed. GitHub is processing the file."); }
         }
 
-        init();
+        start();
     </script>
 </body>
 </html>
