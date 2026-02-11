@@ -2,60 +2,41 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Vektör Panel | Yükleme</title>
+    <title>Admin | Free Vector Stock</title>
     <style>
-        body { background: #111; color: #eee; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .box { background: #222; padding: 30px; border-radius: 15px; border: 2px solid #f39c12; width: 350px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 5px; border: 1px solid #444; background: #333; color: white; box-sizing: border-box; }
-        .btn { background: #f39c12; color: #000; border: none; padding: 12px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .btn:hover { background: #e67e22; }
-        #log { font-size: 12px; margin-top: 15px; color: #aaa; }
+        body { background: #111; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .box { background: #222; padding: 30px; border: 2px solid #f39c12; border-radius: 15px; width: 350px; text-align: center; }
+        input { width: 100%; padding: 10px; margin: 10px 0; background: #333; color: white; border: 1px solid #444; }
+        button { background: #f39c12; color: black; border: none; padding: 12px; width: 100%; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
     <div class="box">
         <h2 style="color:#f39c12">Vektör Yükle</h2>
-        <input type="text" id="token" placeholder="GitHub Token (ghp_...)" />
-        <input type="text" id="title" placeholder="Dosya Başlığı (Örn: modern-logo)" />
-        <p style="font-size:12px">Aşağıdan 1 EPS ve 1 JPG seçin:</p>
+        <input type="text" id="token" placeholder="GitHub Token" />
+        <input type="text" id="title" placeholder="Tasarım Adı" />
         <input type="file" id="files" multiple />
-        <button class="btn" onclick="startUpload()">SİSTEME YÜKLE</button>
-        <div id="log"></div>
+        <button onclick="upload()">SİSTEME GÖNDER</button>
+        <div id="status" style="margin-top:10px; font-size:12px"></div>
     </div>
-
     <script>
-        async function startUpload() {
+        async function upload() {
             const token = document.getElementById('token').value;
             const title = document.getElementById('title').value;
             const files = document.getElementById('files').files;
-            const log = document.getElementById('log');
-
-            if (!token || !title || files.length < 2) {
-                alert("Lütfen Token, Başlık ve 2 Dosyayı (EPS+JPG) eksiksiz girin!");
-                return;
-            }
-
-            log.innerText = "Yükleme başladı...";
-
-            for (let file of files) {
+            const status = document.getElementById('status');
+            for(let file of files) {
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
                 reader.onload = async () => {
                     const content = reader.result.split(',')[1];
-                    const cleanTitle = title.replace(/\s+/g, '-').toLowerCase();
-                    const path = `vectors/${cleanTitle}/${file.name}`;
-                    
-                    const res = await fetch(`https://api.github.com/repos/hakankacar2014-demir/vector-storage/contents/${path}`, {
+                    const path = `vectors/${title}/${file.name}`;
+                    const res = await fetch(`https://api.github.com/repos/hakankacar2014-demir/free-vector-stock/contents/${path}`, {
                         method: 'PUT',
                         headers: { 'Authorization': `token ${token}` },
-                        body: JSON.stringify({ message: `Upload: ${title}`, content: content })
+                        body: JSON.stringify({ message: 'upload', content: content })
                     });
-
-                    if (res.ok) {
-                        log.innerHTML += `<br>✅ ${file.name} yüklendi.`;
-                    } else {
-                        log.innerHTML += `<br>❌ ${file.name} HATA! Token yanlış olabilir.`;
-                    }
+                    status.innerText = res.ok ? "✅ Başarıyla yüklendi!" : "❌ Hata oluştu!";
                 };
             }
         }
