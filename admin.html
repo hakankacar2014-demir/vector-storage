@@ -1,31 +1,57 @@
 <!DOCTYPE html>
 <html lang="tr">
-<head><meta charset="UTF-8"><title>Admin | Free Vector Stock</title></head>
-<body style="background:#111; color:#fff; font-family:sans-serif; text-align:center; padding-top:50px;">
-    <h2 style="color:#f39c12">VEKTÖR YÜKLE</h2>
-    <input type="text" id="token" placeholder="GitHub Token" style="padding:10px; width:300px;"><br><br>
-    <input type="text" id="title" placeholder="Tasarım Adı" style="padding:10px; width:300px;"><br><br>
-    <input type="file" id="files" multiple style="color:#fff;"><br><br>
-    <button onclick="upload()" style="background:#f39c12; padding:10px 40px; font-weight:bold; cursor:pointer; border:none; border-radius:5px;">SİSTEME GÖNDER</button>
-    <div id="status" style="margin-top:20px;"></div>
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Panel | Free Vector Stock</title>
+    <style>
+        body { background: #0f0f0f; color: #fff; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .upload-box { background: #1a1a1a; padding: 40px; border-radius: 20px; border: 2px solid #f39c12; width: 380px; text-align: center; }
+        h2 { color: #f39c12; text-transform: uppercase; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #333; background: #252525; color: white; box-sizing: border-box; }
+        .btn { background: #f39c12; color: #000; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 15px; }
+        #status { margin-top: 20px; font-size: 14px; color: #f39c12; }
+    </style>
+</head>
+<body>
+    <div class="upload-box">
+        <h2>Vektör Yükle</h2>
+        <input type="text" id="token" placeholder="GitHub Token (ghp_...)" />
+        <input type="text" id="title" placeholder="Tasarım Adı" />
+        <input type="file" id="fileInput" multiple />
+        <button class="btn" onclick="uploadToGithub()">SİSTEME GÖNDER</button>
+        <div id="status"></div>
+    </div>
+
     <script>
-        async function upload() {
+        async function uploadToGithub() {
             const token = document.getElementById('token').value;
-            const title = document.getElementById('title').value;
-            const files = document.getElementById('files').files;
+            const title = document.getElementById('title').value.trim().replace(/\s+/g, '-').toLowerCase();
+            const files = document.getElementById('fileInput').files;
             const status = document.getElementById('status');
-            status.innerText = "Yükleniyor...";
-            for(let file of files) {
+
+            if (!token || !title || files.length < 2) {
+                status.innerText = "❌ Eksik bilgi veya dosya!";
+                return;
+            }
+
+            status.innerText = "⏳ Yükleniyor...";
+            const OWNER = 'free-vector-stock';
+            const REPO = 'free-vector-stock';
+
+            for (let file of files) {
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
                 reader.onload = async () => {
                     const content = reader.result.split(',')[1];
-                    const res = await fetch(`https://api.github.com/repos/free-vector-stock/free-vector-stock/contents/vectors/${title}/${file.name}`, {
+                    const path = `vectors/${title}/${file.name}`;
+                    
+                    const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${path}`, {
                         method: 'PUT',
                         headers: { 'Authorization': `token ${token}` },
-                        body: JSON.stringify({ message: 'upload', content: content })
+                        body: JSON.stringify({ message: `Upload: ${title}`, content: content })
                     });
-                    status.innerText = res.ok ? "✅ Başarıyla yüklendi!" : "❌ Hata oluştu!";
+
+                    status.innerText = res.ok ? "✅ Başarıyla yüklendi!" : "❌ Hata!";
                 };
             }
         }
