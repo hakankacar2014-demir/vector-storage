@@ -3,112 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Free Vector Stock | Pro Edition</title>
+    <title>Free Vector Stock | Pro</title>
     <style>
-        body { background: #000; color: #fff; font-family: 'Segoe UI', sans-serif; text-align: center; margin: 0; padding: 20px; }
-        h1 { color: #f39c12; text-transform: uppercase; margin-top: 20px; font-size: 24px; letter-spacing: 2px; }
-        .search-container { margin: 25px auto; max-width: 600px; }
-        #searchInput { width: 100%; padding: 14px 25px; border-radius: 30px; border: 2px solid #333; background: #111; color: #fff; font-size: 16px; outline: none; transition: 0.3s; }
-        #searchInput:focus { border-color: #f39c12; box-shadow: 0 0 10px rgba(243, 156, 18, 0.2); }
-        .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 25px; padding: 20px; max-width: 1300px; margin: 0 auto; }
-        .card { background: #111; border: 1px solid #222; padding: 15px; border-radius: 12px; display: flex; flex-direction: column; justify-content: space-between; transition: 0.2s; }
-        .card:hover { transform: translateY(-5px); border-color: #444; }
+        body { background: #000; color: #fff; font-family: sans-serif; text-align: center; margin: 0; padding: 20px; }
+        .search-container { margin: 30px auto; max-width: 600px; }
+        #searchInput { width: 100%; padding: 15px; border-radius: 30px; border: 2px solid #333; background: #111; color: #fff; outline: none; }
+        .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 25px; max-width: 1200px; margin: 0 auto; }
+        .card { background: #111; border: 1px solid #222; padding: 15px; border-radius: 12px; }
         .card img { width: 100%; height: 160px; object-fit: contain; background: #080808; border-radius: 8px; }
-        .card-title { color: #f39c12; font-size: 12px; margin: 15px 0; text-transform: uppercase; font-weight: bold; min-height: 30px; }
-        .btn { background: #f39c12; color: #000; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; }
-        .pagination { margin: 40px 0; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
-        .page-btn { background: #111; color: #aaa; border: 1px solid #333; padding: 10px 18px; border-radius: 6px; cursor: pointer; }
-        .page-btn.active { background: #f39c12; color: #000; border-color: #f39c12; }
+        .card-title { color: #f39c12; font-size: 12px; margin: 15px 0; text-transform: uppercase; font-weight: bold; }
+        .btn { background: #f39c12; color: #000; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%; }
+        .pagination { margin: 40px 0; display: flex; justify-content: center; gap: 8px; }
+        .page-btn { background: #111; color: #fff; border: 1px solid #f39c12; padding: 8px 15px; border-radius: 5px; cursor: pointer; }
+        .page-btn.active { background: #f39c12; color: #000; }
     </style>
 </head>
 <body>
-
-    <h1>FREE VECTOR STOCK</h1>
-
-    <div class="search-container">
-        <input type="text" id="searchInput" placeholder="Search (e.g. food, pizza...)" onkeyup="handleSearch()">
-    </div>
-
-    <div id="gallery" class="gallery">Loading designs...</div>
+    <h1 style="color:#f39c12">FREE VECTOR STOCK</h1>
+    <div class="search-container"><input type="text" id="searchInput" placeholder="Search designs..." onkeyup="search()"></div>
+    <div id="gallery" class="gallery">Loading database...</div>
     <div id="pagination" class="pagination"></div>
 
     <script>
         const OWNER = 'free-vector-stock';
         const REPO = 'free-vector-stock';
-        const ITEMS_PER_PAGE = 12;
-        
-        let allItems = [];
-        let filteredItems = [];
-        let currentPage = 1;
+        let allItems = [], filteredItems = [], currentPage = 1, perPage = 12;
 
         async function init() {
             try {
-                // API yerine kendi JSON dosyamızı çağırıyoruz (Limit yok!)
                 const res = await fetch('vectors.json?t=' + Date.now());
                 allItems = await res.json();
-                allItems.reverse(); // En yeniler önce gelsin
+                allItems.reverse();
                 filteredItems = [...allItems];
-                renderPage(1);
-            } catch (error) {
-                document.getElementById('gallery').innerText = "Database error. Please check vectors.json file.";
-            }
+                render(1);
+            } catch (e) { document.getElementById('gallery').innerText = "Veritabanı bulunamadı. Lütfen vectors.json oluşturun."; }
         }
 
-        function renderPage(page) {
+        function render(page) {
             currentPage = page;
             const gallery = document.getElementById('gallery');
             gallery.innerHTML = '';
-            
-            const start = (page - 1) * ITEMS_PER_PAGE;
-            const end = start + ITEMS_PER_PAGE;
-            const itemsToShow = filteredItems.slice(start, end);
+            const items = filteredItems.slice((page-1)*perPage, page*perPage);
 
-            itemsToShow.forEach(name => {
-                const safeName = name.replace(/-/g, ' ');
-                const jpgUrl = `https://raw.githubusercontent.com/${OWNER}/${REPO}/main/vectors/${name}/${name}.jpg`;
-                const epsUrl = `https://raw.githubusercontent.com/${OWNER}/${REPO}/main/vectors/${name}/${name}.eps`;
-
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.innerHTML = `
-                    <img src="${jpgUrl}" onerror="this.src='https://via.placeholder.com/240x160?text=Design+Pending'">
-                    <div class="card-title">${safeName}</div>
-                    <button class="btn" onclick="downloadFile('${epsUrl}', '${name}.eps')">DOWNLOAD EPS</button>
-                `;
-                gallery.appendChild(card);
+            items.forEach(name => {
+                const img = `https://raw.githubusercontent.com/${OWNER}/${REPO}/main/vectors/${name}/${name}.jpg`;
+                const eps = `https://raw.githubusercontent.com/${OWNER}/${REPO}/main/vectors/${name}/${name}.eps`;
+                gallery.innerHTML += `<div class="card">
+                    <img src="${img}" onerror="this.src='https://via.placeholder.com/240x160?text=Pending'">
+                    <div class="card-title">${name.replace(/-/g, ' ')}</div>
+                    <button class="btn" onclick="dl('${eps}', '${name}.eps')">DOWNLOAD EPS</button>
+                </div>`;
             });
-            renderPagination();
+            setupPages();
         }
 
-        function handleSearch() {
-            const query = document.getElementById('searchInput').value.toLowerCase().trim();
-            filteredItems = allItems.filter(name => name.toLowerCase().replace(/-/g, ' ').includes(query));
-            renderPage(1);
+        function search() {
+            const q = document.getElementById('searchInput').value.toLowerCase();
+            filteredItems = allItems.filter(n => n.toLowerCase().includes(q));
+            render(1);
         }
 
-        function renderPagination() {
-            const container = document.getElementById('pagination');
-            const totalPages = Math.ceil(filteredItems.length / ITEMS_PER_PAGE);
-            container.innerHTML = '';
-            if (totalPages <= 1) return;
-            for (let i = 1; i <= totalPages; i++) {
-                const btn = document.createElement('button');
-                btn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
-                btn.innerText = i;
-                btn.onclick = () => { window.scrollTo(0,0); renderPage(i); };
-                container.appendChild(btn);
+        function setupPages() {
+            const p = document.getElementById('pagination');
+            const total = Math.ceil(filteredItems.length / perPage);
+            p.innerHTML = '';
+            if(total <= 1) return;
+            for(let i=1; i<=total; i++) {
+                p.innerHTML += `<button class="page-btn ${i===currentPage?'active':''}" onclick="render(${i})">${i}</button>`;
             }
         }
 
-        async function downloadFile(url, filename) {
+        async function dl(url, name) {
             const res = await fetch(url);
             const blob = await res.blob();
-            const link = document.createElement('a');
-            link.href = window.URL.createObjectURL(blob);
-            link.download = filename;
-            link.click();
+            const a = document.createElement('a');
+            a.href = window.URL.createObjectURL(blob);
+            a.download = name;
+            a.click();
         }
-
         init();
     </script>
 </body>
