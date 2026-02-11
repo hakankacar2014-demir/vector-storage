@@ -3,21 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Free Vector Stock | Ultimate Fix</title>
+    <title>Free Vector Stock | Ultimate Edition</title>
     <style>
-        body { background: #000; color: #fff; font-family: 'Segoe UI', sans-serif; text-align: center; margin: 0; padding: 20px; }
-        .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; max-width: 1400px; margin: 30px auto; }
-        .card { background: #0a0a0a; border: 1px solid #1a1a1a; padding: 15px; border-radius: 12px; transition: 0.3s; }
-        .card:hover { border-color: #f39c12; transform: translateY(-5px); }
-        .img-box { width: 100%; height: 180px; background: #050505; border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-bottom: 12px; }
-        .img-box img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        .card-title { color: #f39c12; font-size: 11px; font-weight: bold; margin-bottom: 15px; text-transform: uppercase; height: 30px; display: flex; align-items: center; justify-content: center; }
-        .btn { background: #f39c12; color: #000; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; text-decoration: none; display: block; width: 100%; box-sizing: border-box; font-size: 12px; }
+        :root { --accent: #f39c12; --bg: #000; --card-bg: #0a0a0a; }
+        body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; text-align: center; margin: 0; padding: 20px; }
+        h1 { color: var(--accent); text-transform: uppercase; letter-spacing: 4px; margin: 30px 0; font-size: 28px; }
+        
+        .gallery { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 25px; 
+            max-width: 1400px; 
+            margin: 0 auto; 
+            padding: 20px;
+        }
+
+        .card { 
+            background: var(--card-bg); 
+            border: 1px solid #1a1a1a; 
+            padding: 20px; 
+            border-radius: 16px; 
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            display: flex; 
+            flex-direction: column;
+        }
+        .card:hover { border-color: var(--accent); transform: translateY(-10px); box-shadow: 0 10px 30px rgba(243, 156, 18, 0.1); }
+
+        .img-box { 
+            width: 100%; 
+            height: 200px; 
+            background: #050505; 
+            border-radius: 10px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            overflow: hidden; 
+            margin-bottom: 15px;
+        }
+        .img-box img { max-width: 90%; max-height: 90%; object-fit: contain; transition: 0.3s; }
+
+        .card-title { 
+            color: var(--accent); 
+            font-size: 13px; 
+            font-weight: 700; 
+            margin-bottom: 15px; 
+            text-transform: uppercase; 
+            min-height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn { 
+            background: var(--accent); 
+            color: #000; 
+            padding: 14px; 
+            border: none; 
+            border-radius: 8px; 
+            font-weight: 900; 
+            cursor: pointer; 
+            text-decoration: none; 
+            font-size: 13px; 
+            transition: 0.2s;
+        }
+        .btn:hover { background: #ffb133; transform: scale(1.03); }
+        
+        #loader { font-weight: bold; color: var(--accent); margin-top: 50px; }
     </style>
 </head>
 <body>
-    <h1 style="color:#f39c12; letter-spacing: 2px;">FREE VECTOR STOCK</h1>
-    <div id="gallery" class="gallery">Sistem taranıyor...</div>
+
+    <h1>FREE VECTOR STOCK</h1>
+
+    <div id="loader">Database Loading...</div>
+    <div id="gallery" class="gallery"></div>
 
     <script>
         const OWNER = 'free-vector-stock';
@@ -25,26 +84,27 @@
 
         async function init() {
             try {
-                const r = await fetch('vectors.json?v=' + Date.now());
-                const names = await r.json();
-                render(names.reverse());
+                const r = await fetch('vectors.json?nocache=' + Date.now());
+                const items = await r.json();
+                document.getElementById('loader').style.display = 'none';
+                render(items.reverse());
             } catch (e) {
-                document.getElementById('gallery').innerText = "Veritabanı (vectors.json) okunamadı!";
+                document.getElementById('loader').innerText = "Error: Database not found!";
             }
         }
 
-        function render(items) {
+        function render(data) {
             const gal = document.getElementById('gallery');
             gal.innerHTML = '';
-            
-            items.forEach(name => {
+
+            data.forEach(name => {
                 const enc = encodeURIComponent(name);
                 
-                // 3 Farklı Olası Yol Tanımlıyoruz:
-                // 1. Kendi klasöründe: vectors/ad/ad.jpg
-                // 2. "1" klasöründe: vectors/1/ad.jpg
-                // 3. Klasörsüz (doğrudan vectors içinde): vectors/ad.jpg
-                const paths = [
+                // image_c5b605.png ve image_c61472.jpg'deki tüm karmaşık yolları tarar:
+                // 1. Yol: vectors/AD/AD.jpg (Standart)
+                // 2. Yol: vectors/1/AD.jpg (Görüntüdeki "1" klasörü)
+                // 3. Yol: vectors/AD.jpg (Doğrudan klasörsüz)
+                const imgPaths = [
                     `https://cdn.jsdelivr.net/gh/${OWNER}/${REPO}/vectors/${enc}/${enc}.jpg`,
                     `https://cdn.jsdelivr.net/gh/${OWNER}/${REPO}/vectors/1/${enc}.jpg`,
                     `https://cdn.jsdelivr.net/gh/${OWNER}/${REPO}/vectors/${enc}.jpg`
@@ -54,28 +114,26 @@
                 card.className = 'card';
                 card.innerHTML = `
                     <div class="img-box">
-                        <img src="${paths[0]}" onerror="tryNext(this, ${JSON.stringify(paths)})">
+                        <img src="${imgPaths[0]}" onerror="tryNext(this, ${JSON.stringify(imgPaths)})">
                     </div>
                     <div class="card-title">${name.replace(/-/g, ' ')}</div>
-                    <button class="btn" onclick="handleDownload('${name}')">DOWNLOAD EPS</button>
+                    <button class="btn" onclick="downloadEps('${name}')">DOWNLOAD EPS</button>
                 `;
                 gal.appendChild(card);
             });
         }
 
-        // Resim bulunamazsa sırayla diğer yolları dener
         function tryNext(img, paths) {
             let currentIdx = paths.indexOf(img.src);
             if (currentIdx < paths.length - 1) {
                 img.src = paths[currentIdx + 1];
             } else {
-                img.src = 'https://via.placeholder.com/300x200/111/f39c12?text=Preview+Error';
+                img.src = 'https://via.placeholder.com/300x200/111/f39c12?text=Preview+Not+Found';
                 img.onerror = null;
             }
         }
 
-        // İndirme butonu için dosyayı 3 konumda da arar
-        async function handleDownload(name) {
+        async function downloadEps(name) {
             const enc = encodeURIComponent(name);
             const epsPaths = [
                 `https://raw.githubusercontent.com/${OWNER}/${REPO}/main/vectors/${enc}/${enc}.eps`,
@@ -92,7 +150,7 @@
                     }
                 } catch (e) {}
             }
-            alert("EPS dosyası bulunamadı. Lütfen dosya yolunu kontrol edin.");
+            alert("File is still being processed by GitHub. Please wait 1 minute.");
         }
 
         init();
