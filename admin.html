@@ -2,73 +2,113 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>SECURE SMART UPLOAD</title>
+    <title>AI SMART UPLOAD SYSTEM | 40 KEYWORDS</title>
     <style>
-        body { background:#000; color:#fff; font-family: sans-serif; display:flex; justify-content:center; align-items:center; min-height:100vh; margin:0; }
-        .box { background:#111; padding:40px; border-radius:20px; border:2px solid #f39c12; width:400px; text-align:center; }
-        input { width:100%; padding:12px; margin:10px 0; border-radius:6px; border:1px solid #333; background:#1a1a1a; color:white; box-sizing: border-box; }
-        button { width:100%; padding:15px; background:#27ae60; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer; width: 100%; }
-        #log { margin-top:15px; font-size:11px; color:#888; text-align:left; max-height:150px; overflow-y:auto; padding:10px; background:#000; }
+        body { background:#0a0a0a; color:#eee; font-family: 'Segoe UI', sans-serif; display:flex; justify-content:center; align-items:center; min-height:100vh; margin:0; }
+        .box { background:#111; padding:35px; border-radius:15px; border:2px solid #f39c12; width:500px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        h2 { color:#f39c12; text-align:center; margin-top:0; letter-spacing: 2px; }
+        input, textarea { width:100%; padding:12px; margin:10px 0; border-radius:6px; border:1px solid #333; background:#1a1a1a; color:white; box-sizing: border-box; outline: none; }
+        input:focus { border-color: #f39c12; }
+        button { width:100%; padding:15px; background:#27ae60; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer; font-size: 16px; transition: 0.3s; }
+        button:hover { background: #2ecc71; }
+        button:disabled { background: #444; cursor: not-allowed; }
+        #log { margin-top:15px; font-size:11px; color:#aaa; text-align:left; max-height:180px; overflow-y:auto; padding:12px; background:#000; border-radius: 5px; line-height: 1.6; }
     </style>
 </head>
 <body>
     <div class="box">
-        <h2>SECURE UPLOAD 2026</h2>
-        <input type="password" id="tk" placeholder="GitHub Token">
+        <h2>SİSTEM OTOMATİK YÜKLEME</h2>
+        <input type="password" id="tk" placeholder="GitHub Personal Access Token">
         <input type="file" id="fi" multiple accept=".jpg,.eps">
-        <button id="btn" onclick="startProcess()">START SECURE UPLOAD</button>
-        <div id="log">Waiting for files...</div>
+        <textarea id="desc" placeholder="Özel açıklama (Boş bırakırsanız sistem otomatik üretir)"></textarea>
+        <button id="btn" onclick="startProcess()">DOSYALARI İŞLE VE YÜKLE</button>
+        <div id="log">Sistem hazır. 1000 dosyaya kadar toplu yükleme yapabilirsiniz.</div>
     </div>
 
 <script>
+    // 40 Kelimeye tamamlamak için devasa sektörel kelime havuzu
+    const keywordBank = [
+        "vector", "illustration", "graphic", "design", "premium", "free", "stock", "high-quality", "commercial", "isolated", 
+        "artistic", "creative", "modern", "professional", "elements", "eps", "digital", "draw", "symbol", "icon", 
+        "background", "template", "style", "trendy", "abstract", "clean", "simple", "flat", "detailed", "concept",
+        "web", "print", "marketing", "advertising", "collection", "set", "pack", "resource", "visual", "workspace"
+    ];
+
     async function startProcess() {
         const token = document.getElementById('tk').value;
         const files = Array.from(document.getElementById('fi').files);
+        const globalDesc = document.getElementById('desc').value;
         const log = document.getElementById('log');
-        if(!token || files.length === 0) return alert("Fill all fields!");
+        
+        if(!token || files.length === 0) return alert("HATA: Token ve Dosyalar eksik!");
 
         document.getElementById('btn').disabled = true;
-        log.innerHTML = "Processing files...";
+        log.innerHTML = "<b>Yükleme işlemi başladı... Lütfen bekleyin.</b>";
 
         const jpegs = files.filter(f => f.name.toLowerCase().endsWith('.jpg'));
+        
         for (let jpg of jpegs) {
             let base = jpg.name.split('.')[0];
-            let clean = base.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '').replace(/-+/g, '-');
+            let clean = base.toLowerCase().replace(/\s+/g, '-').replace(/[()]/g, '').replace(/[^a-z0-9-]/g, '').replace(/-+/g, '-');
             let uniqueID = Math.floor(10000 + Math.random() * 90000);
-            let finalName = `${clean}-${uniqueID}`;
-            
+            let folder = `${clean}-${uniqueID}`;
+
+            // OTOMATİK 40 KELİME ÜRETME
+            let nameWords = clean.split('-').filter(w => w.length > 2);
+            let keysSet = new Set([...nameWords, ...keywordBank]);
+            let finalKeys = Array.from(keysSet).slice(0, 40).join(', ');
+
             const eps = files.find(f => f.name.split('.')[0] === base && f.name.toLowerCase().endsWith('.eps'));
 
             if (eps) {
-                log.innerHTML += `<div>⚙️ Saving: ${finalName}</div>`;
-                await push(finalName, jpg, `${finalName}.jpg`, token);
-                await push(finalName, eps, `${finalName}.eps`, token);
-                await updateJson(finalName, token);
-                log.innerHTML += `<div style="color:green">✓ Successfully Uploaded!</div>`;
+                log.innerHTML += `<div>⚙️ İşleniyor: ${folder}</div>`;
+                try {
+                    await push(folder, jpg, `${folder}.jpg`, token);
+                    await push(folder, eps, `${folder}.eps`, token);
+                    
+                    const data = {
+                        name: folder,
+                        desc: globalDesc || `High-quality ${clean.replace(/-/g, ' ')} vector illustration. Perfect for professional design projects.`,
+                        keys: finalKeys
+                    };
+
+                    await update(data, token);
+                    log.innerHTML += `<div style="color:#27ae60">✓ BAŞARILI: ${folder}</div>`;
+                } catch (e) {
+                    log.innerHTML += `<div style="color:red">X HATA: ${e.message}</div>`;
+                }
             }
         }
-        alert("Upload session finished!");
+        log.innerHTML += "<div><b>BİTTİ: Tüm dosyalar yayına hazır!</b></div>";
         document.getElementById('btn').disabled = false;
     }
 
-    async function push(folder, file, name, token) {
-        const content = await toB64(file);
-        const url = `https://api.github.com/repos/free-vector-stock/free-vector-stock/contents/vectors/${folder}/${name}`;
-        await fetch(url, { method: 'PUT', headers: { 'Authorization': `token ${token}` }, body: JSON.stringify({ message: `Secure Add: ${name}`, content: content.split(',')[1] }) });
+    async function push(fld, file, name, tk) {
+        const b64 = await toB64(file);
+        const url = `https://api.github.com/repos/free-vector-stock/free-vector-stock/contents/vectors/${fld}/${name}`;
+        await fetch(url, {
+            method: 'PUT',
+            headers: { 'Authorization': `token ${tk}` },
+            body: JSON.stringify({ message: `Add ${name}`, content: b64.split(',')[1] })
+        });
     }
 
-    async function updateJson(name, token) {
+    async function update(newData, tk) {
         const url = `https://api.github.com/repos/free-vector-stock/free-vector-stock/contents/vectors.json`;
         const res = await fetch(url);
-        const data = await res.json();
-        let list = JSON.parse(atob(data.content));
-        list.unshift(name);
-        await fetch(url, { method: 'PUT', headers: { 'Authorization': `token ${token}` }, body: JSON.stringify({ message: `Update Index ${name}`, content: btoa(JSON.stringify(list)), sha: data.sha }) });
+        const f = await res.json();
+        let list = JSON.parse(atob(f.content));
+        list.unshift(newData);
+        await fetch(url, {
+            method: 'PUT',
+            headers: { 'Authorization': `token ${tk}` },
+            body: JSON.stringify({ message: `Update Index`, content: btoa(JSON.stringify(list, null, 2)), sha: f.sha })
+        });
     }
 
-    const toB64 = file => new Promise((resolve, reject) => {
-        const reader = new FileReader(); reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result); reader.onerror = e => reject(e);
+    const toB64 = f => new Promise((res, rej) => {
+        const r = new FileReader(); r.readAsDataURL(f);
+        r.onload = () => res(r.result); r.onerror = e => rej(e);
     });
 </script>
 </body>
