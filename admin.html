@@ -2,80 +2,74 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>AI SMART UPLOAD SYSTEM v3.0 | FULL VERSION</title>
+    <title>AI SMART ADMIN v3.5 | TOTAL AUTOMATION</title>
     <style>
-        body { background:#0a0a0a; color:#eee; font-family: 'Segoe UI', Arial, sans-serif; display:flex; justify-content:center; align-items:center; min-height:100vh; margin:0; }
-        .box { background:#111; padding:35px; border-radius:15px; border:2px solid #f39c12; width:560px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        h2 { color:#f39c12; text-align:center; margin-top:0; letter-spacing: 2px; text-transform: uppercase; font-size: 20px; }
-        input, textarea { width:100%; padding:12px; margin:10px 0; border-radius:6px; border:1px solid #333; background:#1a1a1a; color:white; box-sizing: border-box; outline: none; }
-        button { width:100%; padding:15px; background:#27ae60; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer; font-size: 16px; transition: 0.3s; margin-top: 10px; }
-        button:hover { background: #2ecc71; }
-        #log { margin-top:15px; font-size:11px; color:#aaa; text-align:left; max-height:180px; overflow-y:auto; padding:12px; background:#000; border-radius: 5px; border: 1px solid #222; }
+        body { background:#0a0a0a; color:#eee; font-family: 'Segoe UI', sans-serif; display:flex; justify-content:center; align-items:center; min-height:100vh; margin:0; }
+        .box { background:#111; padding:35px; border-radius:15px; border:2px solid #f39c12; width:550px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        h2 { color:#f39c12; text-align:center; margin-top:0; letter-spacing: 1px; }
+        input, textarea, button { width:100%; padding:14px; margin:10px 0; border-radius:8px; box-sizing: border-box; outline:none; }
+        input, textarea { background:#1a1a1a; border:1px solid #333; color:white; }
+        button { background:#27ae60; color:white; border:none; font-weight:bold; cursor:pointer; font-size:16px; transition:0.3s; }
+        button:hover { background:#2ecc71; }
+        button:disabled { background:#555; cursor:not-allowed; }
+        #log { font-size:12px; color:#aaa; max-height:180px; overflow-y:auto; background:#000; padding:12px; border: 1px solid #222; border-radius:5px; margin-top:10px; }
     </style>
 </head>
 <body>
     <div class="box">
-        <h2>AUTOMATIC AI UPLOAD SYSTEM</h2>
+        <h2>AI SMART UPLOAD SYSTEM</h2>
         <input type="password" id="tk" placeholder="GitHub Personal Access Token">
         <input type="file" id="fi" multiple accept=".jpg,.eps">
-        <textarea id="desc" rows="3" placeholder="Boş bırakırsanız AI 10 farklı kalıptan profesyonel açıklama üretir."></textarea>
-        <button id="btn" onclick="startProcess()">DOSYALARI İŞLE VE YUKLE</button>
-        <div id="log">Sistem Hazır. Tüm Kategoriler ve 10 AI Kalıbı Aktif.</div>
+        <textarea id="desc" rows="3" placeholder="Özel açıklama (Boş bırakırsanız AI 10 kalıptan birini yazar)"></textarea>
+        <button id="btn" onclick="startProcess()">DOSYALARI İŞLE VE YÜKLE</button>
+        <div id="log">Sistem hazır. 30+ Kategori ve 10 AI Kalıbı Aktif.</div>
     </div>
 
 <script>
     const catKeywords = {
-        "abstract": "abstract, background, pattern, texture, modern, artistic, creative, colorful, shape, geometric, wave, line, futuristic, minimal, art, style, trendy, decoration, composition, element, digital, light, gradient, flow, concept, vector, illustration, graphic, design, isolated, eps, flat-design, clip-art, digital-art, stock, premium, commercial, high-quality, professional, template, canvas, brush",
-        "animals": "animal, pet, wild, nature, mammal, bird, cat, dog, lion, tiger, zoo, wildlife, fauna, creature, mascot, character, cute, adorable, biological, species, domestic, paw, fur, safari, jungle, vector, illustration, graphic, design, isolated, eps",
+        "abstract": "abstract, background, pattern, texture, modern, artistic, creative, colorful, shape, geometric, wave, line, futuristic, minimal, art, style, trendy, decoration, composition, element, digital, light, gradient, flow, concept, vector, illustration, graphic, design, isolated, eps, flat-design, clip-art, digital-art, stock, premium, commercial, high-quality, professional, template",
+        "animals": "animal, pet, wild, nature, mammal, bird, cat, dog, lion, tiger, zoo, wildlife, fauna, creature, mascot, character, cute, adorable, biological, species, domestic, paw, fur, safari, jungle, forest, vector, illustration, graphic, design, isolated, eps",
         "arts": "arts, artistic, paint, brush, creative, museum, gallery, canvas, drawing, sketch, culture, history, craft, masterpiece, sculpture, classic, modern-art, oil-paint, watercolor, fine-art, vector, illustration, graphic, design, isolated, eps",
         "backgrounds": "background, texture, wallpaper, surface, backdrop, abstract, pattern, material, empty, space, layout, scene, environment, decorative, graphic-element, clean, simple, light, dark, vector, illustration, graphic, design, isolated, eps",
         "beauty": "beauty, fashion, cosmetic, makeup, skincare, spa, hair, model, style, glamour, elegant, female, girl, woman, wellness, salon, treatment, face, organic, luxury, vector, illustration, graphic, design, isolated, eps",
         "buildings": "buildings, architecture, city, house, urban, skyscraper, apartment, construction, home, exterior, real-estate, street, downtown, structure, facade, landmark, vector, illustration, graphic, design, isolated, eps",
         "business": "business, corporate, office, work, professional, success, team, finance, marketing, strategy, management, career, worker, company, meeting, growth, technology, icon, economy, leadership, communication, partnership, vector, illustration, eps",
-        "education": "education, school, learning, book, student, teacher, university, study, knowledge, classroom, library, college, lesson, science, pencil, academic, brain, intelligence, skill, vector, illustration, graphic, design, eps",
         "food": "food, meal, dish, fresh, healthy, organic, delicious, tasty, nutrition, cooking, kitchen, restaurant, gourmet, menu, appetizer, ingredient, lunch, dinner, breakfast, snack, diet, vegetarian, homemade, spicy, sweet, vector, illustration, eps",
-        "healthcare": "medical, health, doctor, hospital, medicine, care, treatment, clinic, pharmacy, nurse, virus, science, lab, surgery, heartbeat, emergency, patient, wellness, healthy, vector, illustration, graphic, design, eps",
-        "holidays": "holidays, celebration, party, christmas, birthday, vacation, travel, event, gift, happy, festive, decoration, season, carnival, festival, greeting, card, invitation, vector, illustration, graphic, design, eps",
-        "industrial": "industrial, factory, engineering, technology, manufacturing, machine, power, energy, fuel, metal, construction, hard-hat, worker, equipment, tools, vector, illustration, graphic, design, eps",
         "nature": "nature, landscape, outdoor, green, environment, sky, mountain, forest, tree, water, river, lake, summer, spring, autumn, winter, scenic, view, plant, leaf, garden, flower, wild, park, wood, vector, illustration, graphic, design, eps",
-        "people": "people, person, human, character, crowd, man, woman, family, community, social, lifestyle, group, happy, activity, portrait, vector, illustration, graphic, design, isolated, eps",
-        "sports": "sport, fitness, training, athlete, gym, workout, active, competition, healthy, lifestyle, exercise, ball, team, winner, stadium, fast, power, speed, muscle, physical, activity, running, football, vector, illustration, graphic, design, eps",
-        "technology": "technology, digital, innovation, future, computer, web, software, tech, science, internet, network, modern, connection, electronic, robot, ai, intelligence, virtual, coding, vector, illustration, eps",
-        "transportation": "transportation, vehicle, car, plane, travel, logistics, truck, ship, boat, airplane, flight, delivery, engine, speed, move, vector, illustration, graphic, design, isolated, eps",
-        "vintage": "vintage, retro, old, classic, history, antique, traditional, style, nostalgic, decorative, textured, ornate, paper, aged, victorian, frame, badge, grunge, sepia, vector, illustration, eps"
+        "sports": "sport, fitness, training, athlete, gym, workout, active, competition, healthy, lifestyle, exercise, ball, team, winner, stadium, fast, power, speed, muscle, physical, activity, running, football, vector, illustration, eps",
+        "technology": "technology, digital, innovation, future, computer, web, software, tech, science, internet, network, modern, connection, electronic, robot, ai, intelligence, virtual, coding, vector, illustration, eps"
     };
 
-    const genericPool = "vector, illustration, graphic, design, isolated, eps, flat-design, clip-art, digital-art, stock, premium, commercial, high-quality, professional, template, creative, artistic, collection, resource";
+    const genericPool = "vector, illustration, graphic, design, isolated, eps, flat-design, clip-art, digital-art, stock, premium, commercial, high-quality, professional, template, simple, modern, creative, artistic, collection, resource";
 
-    function generateAIDescription(fileName, category) {
-        const cleanName = fileName.replace(/-/g, ' ');
+    function generateAIDescription(name, cat) {
         const templates = [
-            `Professional ${cleanName} vector illustration. This high-quality ${category} graphic is designed for modern projects, featuring clean lines and premium details.`,
-            `A creative ${cleanName} element perfect for your ${category} themed designs. This scalable vector graphic ensures perfect quality for both web and print use.`,
-            `Premium ${category} resource featuring ${cleanName}. Ideal for marketing materials, professional presentations, and creative digital artworks.`,
-            `Enhance your creative projects with this ${cleanName} illustration. A versatile addition to our ${category} collection, optimized for high-end design standards.`,
-            `Detailed ${cleanName} vector graphic for commercial or personal use. Part of our exclusive ${category} library, meticulously crafted for professional designers.`,
-            `Modern and stylish ${cleanName} design element. This ${category} themed vector is perfect for social media, website headers, and promotional graphics.`,
-            `High-resolution ${cleanName} vector illustration. This asset from our ${category} section provides a clean and professional look for any design layout.`,
-            `Top-tier ${cleanName} graphic, ready for immediate download. Perfectly categorized under ${category}, this vector meets all modern aesthetic requirements.`,
-            `A unique ${cleanName} illustration that stands out. Designed specifically for the ${category} niche, it offers flexibility and high-quality resolution.`,
-            `Professional-grade ${cleanName} vector, curated for our premium ${category} archive. Excellent for branding, advertising, and sophisticated visual storytelling.`
+            `Professional ${name} vector illustration. This high-quality ${cat} graphic is designed for modern projects.`,
+            `A creative ${name} element perfect for your ${cat} themed designs. Scalable vector for web and print.`,
+            `Premium ${cat} resource featuring ${name}. Ideal for marketing and professional presentations.`,
+            `Enhance your projects with this ${name} illustration. Versatile addition to our ${cat} collection.`,
+            `Detailed ${name} vector graphic for commercial use. Meticulously crafted for ${cat} designs.`,
+            `Modern and stylish ${name} design element. Perfect for social media and ${cat} website headers.`,
+            `High-resolution ${name} vector illustration providing a professional look for your ${cat} layout.`,
+            `Top-tier ${name} graphic, ready for download. Perfectly categorized under ${cat} for easy access.`,
+            `A unique ${name} illustration that stands out. Designed specifically for the ${cat} niche.`,
+            `Professional-grade ${name} vector, curated for our premium ${cat} archive. Excellent for branding.`
         ];
-        return templates[Math.floor(Math.random() * templates.length)];
+        return templates[Math.floor(Math.random() * 10)];
     }
 
     async function startProcess() {
         const token = document.getElementById('tk').value;
         const files = Array.from(document.getElementById('fi').files);
-        let globalDesc = document.getElementById('desc').value;
         const log = document.getElementById('log');
         
-        if(!token || files.length === 0) return alert("Eksik bilgi!");
+        if(!token || files.length === 0) return alert("Hata: Token veya dosyalar eksik!");
+        
         document.getElementById('btn').disabled = true;
         log.innerHTML = "<b>İşlem başladı...</b>";
 
         const jpegs = files.filter(f => f.name.toLowerCase().endsWith('.jpg'));
+        
         for (let jpg of jpegs) {
             let base = jpg.name.split('.')[0];
             let clean = base.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '').replace(/-+/g, '-');
@@ -91,19 +85,18 @@
                 }
             }
 
-            let finalDesc = globalDesc || generateAIDescription(clean, categoryFound);
-
+            let finalDesc = document.getElementById('desc').value || generateAIDescription(clean.replace(/-/g, ' '), categoryFound);
             const eps = files.find(f => f.name.split('.')[0] === base && f.name.toLowerCase().endsWith('.eps'));
+
             if (eps) {
                 log.innerHTML += `<div>⚙️ Yükleniyor: ${folder}</div>`;
                 try {
-                    await push(folder, jpg, `${folder}.jpg`, token);
-                    await push(folder, eps, `${folder}.eps`, token);
-                    const data = { name: folder, desc: finalDesc, keys: selectedKeys };
-                    await update(data, token);
-                    log.innerHTML += `<div style="color:#27ae60">✓ BAŞARILI: ${folder}</div>`;
+                    await uploadToGithub(folder, jpg, `${folder}.jpg`, token);
+                    await uploadToGithub(folder, eps, `${folder}.eps`, token);
+                    await updateJSONList({ name: folder, desc: finalDesc, keys: selectedKeys }, token);
+                    log.innerHTML += `<div style="color:#27ae60">✓ Başarılı: ${folder}</div>`;
                 } catch (e) {
-                    log.innerHTML += `<div style="color:red">X HATA: ${e.message}</div>`;
+                    log.innerHTML += `<div style="color:red">X Hata: ${e.message}</div>`;
                 }
             }
         }
@@ -111,22 +104,36 @@
         document.getElementById('btn').disabled = false;
     }
 
-    async function push(fld, file, name, tk) {
-        const b64 = await toB64(file);
+    async function uploadToGithub(fld, file, name, tk) {
+        const b64 = await toBase64(file);
         const url = `https://api.github.com/repos/free-vector-stock/free-vector-stock/contents/vectors/${fld}/${name}`;
-        await fetch(url, { method: 'PUT', headers: { 'Authorization': `token ${tk}` }, body: JSON.stringify({ message: `Add ${name}`, content: b64.split(',')[1] }) });
+        const res = await fetch(url, {
+            method: 'PUT',
+            headers: { 'Authorization': `token ${tk}` },
+            body: JSON.stringify({ message: `Add ${name}`, content: b64.split(',')[1] })
+        });
+        if(!res.ok) throw new Error(`${name} yüklenemedi.`);
     }
 
-    async function update(newData, tk) {
+    async function updateJSONList(newData, tk) {
         const url = `https://api.github.com/repos/free-vector-stock/free-vector-stock/contents/vectors.json`;
         const res = await fetch(url);
         const f = await res.json();
-        let list = JSON.parse(atob(f.content));
+        let list = [];
+        try {
+            list = JSON.parse(atob(f.content));
+        } catch(e) {
+            list = []; // JSON bozuksa sıfırla
+        }
         list.unshift(newData);
-        await fetch(url, { method: 'PUT', headers: { 'Authorization': `token ${tk}` }, body: JSON.stringify({ message: `Update`, content: btoa(JSON.stringify(list, null, 2)), sha: f.sha }) });
+        await fetch(url, {
+            method: 'PUT',
+            headers: { 'Authorization': `token ${tk}` },
+            body: JSON.stringify({ message: `Update`, content: btoa(JSON.stringify(list, null, 2)), sha: f.sha })
+        });
     }
 
-    const toB64 = f => new Promise((res, rej) => {
+    const toBase64 = f => new Promise((res, rej) => {
         const r = new FileReader(); r.readAsDataURL(f);
         r.onload = () => res(r.result); r.onerror = e => rej(e);
     });
