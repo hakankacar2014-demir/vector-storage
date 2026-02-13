@@ -3,69 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FREE VECTOR STOCK | Professional Graphic Archive</title>
+    <title>FREE VECTOR STOCK | Premium Graphic Library</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Logo için ekstra tıklama stili */
-        header h1 a {
-            color: #fff;
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-        header h1 a:hover {
-            color: #f39c12; /* Üzerine gelince turuncu olur */
-        }
-        /* Arama kutusu iyileştirmesi */
-        .search-container input {
-            width: 100%;
-            padding: 15px;
-            border-radius: 30px;
-            border: 2px solid #333;
-            background: #111;
-            color: #fff;
-            font-size: 16px;
-            outline: none;
-            transition: border-color 0.3s;
-        }
-        .search-container input:focus {
-            border-color: #f39c12;
-        }
+        header h1 a { color: #fff; text-decoration: none; transition: 0.3s; }
+        header h1 a:hover { color: #f39c12; }
     </style>
 </head>
 <body>
     <header>
         <div class="header-content">
             <h1><a href="index.html">FREE VECTOR STOCK</a></h1>
-            <p class="tagline">Explore our massive archive of premium vectors, illustrations, and design elements. Free for your creative projects.</p>
+            <p class="tagline">Premium archive of vectors, illustrations, and design elements for your creative projects.</p>
         </div>
     </header>
 
     <div class="container">
         <aside class="sidebar">
             <h3>CATEGORIES</h3>
-            <ul id="category-list">
-                <li style="color: #666; font-size: 12px; padding: 10px;">Loading categories...</li>
-            </ul>
+            <ul id="category-list"></ul>
         </aside>
 
         <main class="content">
             <div class="search-container">
-                <input type="text" id="search-input" placeholder="Search in 1000+ vectors (e.g. nature, sport, business)...">
+                <input type="text" id="search-input" placeholder="Search in 1000+ vectors (e.g. nature, sport, technology)...">
             </div>
-
-            <div id="vector-grid" class="grid">
-                </div>
-            
-            <div id="no-results" style="display:none; text-align:center; padding:50px; color:#777;">
-                No vectors found matching your search.
-            </div>
+            <div id="vector-grid" class="grid"></div>
+            <div id="no-results" style="display:none; text-align:center; padding:50px; color:#777;">No results found.</div>
         </main>
     </div>
 
-    <div id="detail-modal" class="modal">
-        </div>
-
+    <div id="detail-modal" class="modal"></div>
     <script src="script.js"></script>
 </body>
 </html>
