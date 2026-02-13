@@ -7,16 +7,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Logo için ekstra tıklama stili */
+        /* Orijinal Stillerin */
         header h1 a {
             color: #fff;
             text-decoration: none;
             transition: color 0.3s ease;
         }
         header h1 a:hover {
-            color: #f39c12; /* Üzerine gelince turuncu olur */
+            color: #f39c12;
         }
-        /* Arama kutusu iyileştirmesi */
         .search-container input {
             width: 100%;
             padding: 15px;
@@ -30,6 +29,75 @@
         }
         .search-container input:focus {
             border-color: #f39c12;
+        }
+
+        /* Grid ve Kartlar İçin Ekstra Akıcılık Stilleri */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 25px;
+        }
+        .vector-card {
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 12px;
+            padding: 15px;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+        .vector-card:hover {
+            transform: translateY(-5px);
+            border-color: #f39c12;
+        }
+        .vector-card img {
+            width: 100%;
+            aspect-ratio: 4/3;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            background: #1a1a1a;
+        }
+        .vector-card h4 {
+            margin: 0 0 8px 0;
+            color: #f39c12;
+            font-size: 16px;
+            text-transform: capitalize;
+        }
+        .vector-card p {
+            margin: 0 0 15px 0;
+            color: #888;
+            font-size: 13px;
+            line-height: 1.4;
+            height: 36px;
+            overflow: hidden;
+        }
+        .download-btn {
+            display: block;
+            width: 100%;
+            background: #27ae60;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+        .download-btn:hover {
+            background: #2ecc71;
+        }
+        #category-list li {
+            cursor: pointer;
+            padding: 8px 12px;
+            list-style: none;
+            color: #aaa;
+            transition: 0.3s;
+            border-radius: 4px;
+        }
+        #category-list li:hover {
+            background: #1a1a1a;
+            color: #f39c12;
         }
     </style>
 </head>
@@ -63,9 +131,82 @@
         </main>
     </div>
 
-    <div id="detail-modal" class="modal">
-        </div>
+    <div id="detail-modal" class="modal"></div>
 
-    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const grid = document.getElementById('vector-grid');
+            const catList = document.getElementById('category-list');
+            const searchInput = document.getElementById('search-input');
+            const noResults = document.getElementById('no-results');
+            let allData = [];
+
+            // 1. Veriyi JSON'dan Çek
+            async function init() {
+                try {
+                    const response = await fetch('vectors.json');
+                    if (!response.ok) throw new Error('JSON dosyası bulunamadı!');
+                    allData = await response.json();
+                    
+                    renderCategories(allData);
+                    renderItems(allData);
+                } catch (err) {
+                    console.error('Sistem Hatası:', err);
+                    grid.innerHTML = '<p style="color:#666; grid-column: 1/-1; text-align:center;">Veri yüklenemedi. vectors.json dosyasını kontrol edin.</p>';
+                }
+            }
+
+            // 2. Vektörleri Ekrana Çiz
+            function renderItems(items) {
+                grid.innerHTML = '';
+                if (items.length === 0) {
+                    noResults.style.display = 'block';
+                    return;
+                }
+                noResults.style.display = 'none';
+
+                items.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'vector-card';
+                    card.innerHTML = `
+                        <img src="vectors/${item.name}/${item.name}.jpg" alt="${item.name}" onerror="this.src='https://via.placeholder.com/400x300?text=No+Preview'">
+                        <h4>${item.name.split('-').slice(0,-1).join(' ')}</h4>
+                        <p>${item.desc || 'Premium vector resource for professional design projects.'}</p>
+                        <a href="vectors/${item.name}/${item.name}.eps" class="download-btn" download>EPS DOWNLOAD</a>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
+
+            // 3. Kategorileri Sidebar'a Bas
+            function renderCategories(data) {
+                const cats = ['all', 'abstract', 'business', 'nature', 'technology', 'animals', 'vintage'];
+                catList.innerHTML = cats.map(c => `
+                    <li onclick="filterByCat('${c}')">${c.toUpperCase()}</li>
+                `).join('');
+            }
+
+            // 4. Kategori Filtreleme
+            window.filterByCat = (c) => {
+                if (c === 'all') renderItems(allData);
+                else {
+                    const filtered = allData.filter(v => v.keys.toLowerCase().includes(c));
+                    renderItems(filtered);
+                }
+            };
+
+            // 5. Akıllı Arama (İsim + Anahtar Kelimeler)
+            searchInput.addEventListener('input', (e) => {
+                const term = e.target.value.toLowerCase().trim();
+                const filtered = allData.filter(v => 
+                    v.name.toLowerCase().includes(term) || 
+                    v.keys.toLowerCase().includes(term)
+                );
+                renderItems(filtered);
+            });
+
+            init(); // Sistemi Başlat
+        });
+    </script>
 </body>
 </html>
