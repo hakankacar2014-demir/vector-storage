@@ -3,38 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FREE VECTOR STOCK | Premium Graphic Library</title>
+    <title>FREE VECTOR STOCK | Professional Archive</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
     <style>
-        header h1 a { color: #fff; text-decoration: none; transition: 0.3s; }
+        body { background: #0a0a0a; color: #fff; font-family: 'Inter', sans-serif; margin: 0; }
+        header { background: #000; padding: 30px; text-align: center; border-bottom: 2px solid #f39c12; }
+        header h1 { margin: 0; }
+        header h1 a { color: #fff; text-decoration: none; transition: 0.3s; cursor: pointer; }
         header h1 a:hover { color: #f39c12; }
+        .container { display: flex; max-width: 1400px; margin: 20px auto; gap: 20px; padding: 0 20px; }
+        .sidebar { width: 250px; background: #111; padding: 20px; border-radius: 10px; height: fit-content; }
+        .sidebar h3 { color: #f39c12; border-bottom: 1px solid #333; padding-bottom: 10px; margin-top: 0; }
+        .sidebar ul { list-style: none; padding: 0; }
+        .sidebar li { padding: 10px; cursor: pointer; border-bottom: 1px solid #222; color: #ccc; transition: 0.3s; font-size: 14px; }
+        .sidebar li:hover { color: #f39c12; background: #1a1a1a; padding-left: 15px; }
+        .content { flex: 1; }
+        .search-container input { width: 100%; padding: 15px; border-radius: 30px; border: 1px solid #333; background: #111; color: #fff; box-sizing: border-box; margin-bottom: 20px; outline: none; transition: 0.3s; }
+        .search-container input:focus { border-color: #f39c12; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
+        .card { background: #111; border-radius: 10px; overflow: hidden; border: 1px solid #222; cursor: pointer; transition: 0.3s; }
+        .card:hover { transform: translateY(-5px); border-color: #f39c12; box-shadow: 0 5px 15px rgba(243, 156, 18, 0.2); }
+        .card img { width: 100%; height: 180px; object-fit: cover; border-bottom: 1px solid #222; }
+        .card h3 { font-size: 13px; padding: 12px; margin: 0; text-align: center; text-transform: capitalize; color: #eee; }
     </style>
 </head>
 <body>
     <header>
-        <div class="header-content">
-            <h1><a href="index.html">FREE VECTOR STOCK</a></h1>
-            <p class="tagline">Premium archive of vectors, illustrations, and design elements for your creative projects.</p>
-        </div>
+        <h1><a href="index.html">FREE VECTOR STOCK</a></h1>
     </header>
-
     <div class="container">
         <aside class="sidebar">
             <h3>CATEGORIES</h3>
             <ul id="category-list"></ul>
         </aside>
-
         <main class="content">
             <div class="search-container">
-                <input type="text" id="search-input" placeholder="Search in 1000+ vectors (e.g. nature, sport, technology)...">
+                <input type="text" id="search-input" placeholder="Search vectors, categories or keywords...">
             </div>
             <div id="vector-grid" class="grid"></div>
-            <div id="no-results" style="display:none; text-align:center; padding:50px; color:#777;">No results found.</div>
         </main>
     </div>
+    <script>
+        const grid = document.getElementById('vector-grid');
+        const searchInput = document.getElementById('search-input');
+        const categoryList = document.getElementById('category-list');
+        let allData = [];
 
-    <div id="detail-modal" class="modal"></div>
-    <script src="script.js"></script>
+        async function init() {
+            try {
+                const res = await fetch('vectors.json');
+                if (!res.ok) throw new Error("JSON bulunamadı");
+                allData = await res.json();
+                renderCategories();
+                render(allData);
+            } catch (e) { 
+                console.error("Yükleme hatası:", e);
+                grid.innerHTML = "<p style='color:gray; text-align:center;'>Henüz görsel yüklenmemiş veya JSON hatası var.</p>";
+            }
+        }
+
+        function render(data) {
+            if (data.length === 0) {
+                grid.innerHTML = "<p style='color:gray;'>Sonuç bulunamadı.</p>";
+                return;
+            }
+            grid.innerHTML = data.map(v => `
+                <div class="card" onclick="location.href='vectors/${v.name}/${v.name}.jpg'">
+                    <img src="vectors/${v.name}/${v.name}.jpg" onerror="this.src='https://via.placeholder.com/240x180?text=No+Preview'">
+                    <h3>${v.name.split('-').slice(0,-1).join(' ')}</h3>
+                </div>
+            `).join('');
+        }
+
+        function renderCategories() {
+            const cats = ["Abstract", "Animals", "Arts", "Backgrounds", "Beauty", "Buildings", "Business", "Celebrities", "Education", "Food", "Healthcare", "Holidays", "Industrial", "Interiors", "Nature", "Objects", "Parks", "People", "Religion", "Science", "Signs", "Sports", "Technology", "Transportation", "Vintage"];
+            categoryList.innerHTML = cats.map(c => `<li onclick="filter('${c.toLowerCase()}')">${c}</li>`).join('');
+        }
+
+        function filter(c) {
+            const filtered = allData.filter(v => v.name.toLowerCase().includes(c));
+            render(filtered);
+        }
+
+        searchInput.addEventListener('input', (e) => {
+            const t = e.target.value.toLowerCase();
+            const filtered = allData.filter(v => v.name.toLowerCase().includes(t) || v.keys.toLowerCase().includes(t) || v.desc.toLowerCase().includes(t));
+            render(filtered);
+        });
+
+        init();
+    </script>
 </body>
 </html>
