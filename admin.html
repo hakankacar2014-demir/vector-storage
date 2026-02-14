@@ -1,155 +1,92 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Panel - FREE VECTOR STOCK</title>
+<title>Admin Panel - Asset Manager</title>
 <style>
-body{font-family:Arial;background:#0d0d0d;color:#fff;padding:30px;}
-input,button{padding:10px;margin:10px 0;width:100%;}
-button{background:#f39c12;border:none;cursor:pointer;font-weight:bold;}
-button:hover{opacity:0.85;}
-.log{margin-top:20px;background:#111;padding:15px;border-radius:8px;font-size:14px;}
+body{font-family:Arial;background:#ffffff;margin:0;padding:30px}
+h1{margin-bottom:20px}
+textarea{width:100%;height:150px;margin-bottom:15px;padding:10px}
+button{padding:12px 25px;background:black;color:white;border:none;cursor:pointer}
+#output{white-space:pre-wrap;background:#f5f5f5;padding:15px;margin-top:20px}
 </style>
 </head>
 <body>
 
-<h2>FREE VECTOR STOCK - ADMIN PANEL</h2>
+<h1>Bulk Upload Panel</h1>
 
-<input type="text" id="github-user" placeholder="GitHub Username">
-<input type="text" id="github-repo" placeholder="Repository Name">
-<input type="text" id="github-token" placeholder="GitHub Token">
-<input type="text" id="image-url" placeholder="Image URL (uploads/file.jpg)">
-<input type="text" id="title" placeholder="Vector Title">
+<p>Paste JPEG and EPS file names (minimum 50 recommended)</p>
 
-<button onclick="uploadVector()">UPLOAD VECTOR</button>
+<textarea id="jpegInput" placeholder="example: sports-football-01.jpg"></textarea>
+<textarea id="epsInput" placeholder="example: sports-football-01.eps"></textarea>
 
-<div class="log" id="log"></div>
+<button onclick="generateJSON()">Generate JSON Data</button>
+
+<div id="output"></div>
 
 <script>
 
-const categories = {
-Business:["business","corporate","finance","office","marketing","startup","analytics","strategy"],
-Technology:["technology","digital","ai","data","computer","software","network","cyber"],
-Medical:["medical","health","doctor","hospital","medicine","clinic","nurse","pharmacy"],
-Nature:["nature","tree","forest","eco","leaf","green","wildlife","environment"],
-Sport:["sport","fitness","football","basketball","soccer","gym","training","athlete"],
-Education:["education","school","learning","study","university","book","teacher"],
-Travel:["travel","vacation","tourism","flight","hotel","journey","map"],
-Food:["food","restaurant","meal","drink","coffee","fruit","vegetable"],
-Fashion:["fashion","clothing","style","model","trend","outfit"],
-Music:["music","instrument","song","audio","sound","guitar","piano"],
-Abstract:["abstract","background","shape","pattern","modern","creative"],
-Social:["social","media","network","communication","chat","community"],
-RealEstate:["real estate","house","home","property","building","apartment"],
-Animals:["animal","dog","cat","wildlife","pet","bird"],
-Holiday:["holiday","christmas","halloween","new year","celebration"]
-};
+const categories = [
+"Abstract","Animals/Wildlife","The Arts","Backgrounds/Textures","Beauty/Fashion",
+"Buildings/Landmarks","Business/Finance","Celebrities","Education","Food and Drink",
+"Healthcare/Medical","Holidays","Industrial","Interiors","Miscellaneous","Nature",
+"Objects","Parks/Outdoor","People","Religion","Science","Signs/Symbols",
+"Sports/Recreation","Technology","Transportation","Vintage"
+].sort();
 
-const genericPool=[
-"vector","design","graphic","illustration","icon","template","background",
-"collection","set","isolated","logo","banner","poster","branding",
-"print","web","ui","pack","art","symbol","minimal","flat",
-"colorful","editable","eps","svg","png","jpg","download","premium",
-"modern","creative","element","clipart","stock","high quality"
-];
-
-function log(msg){
-document.getElementById("log").innerHTML+=msg+"<br>";
+function cleanName(name){
+return name.toLowerCase()
+.replace(/\s+/g,'-')
+.replace(/[^a-z0-9\-\.]/g,'')
 }
 
-function detectCategory(title){
-const lower=title.toLowerCase();
-for(const cat in categories){
-for(const word of categories[cat]){
-if(lower.includes(word)) return cat;
+function detectCategory(filename){
+filename = filename.toLowerCase();
+for(let cat of categories){
+if(filename.includes(cat.split("/")[0].toLowerCase())) return cat;
 }
-}
-return "Abstract";
+return "Miscellaneous";
 }
 
-function generateKeywords(title,category){
-let pool=[...genericPool,...categories[category]];
-const titleWords=title.toLowerCase().split(" ");
-pool=[...new Set([...pool,...titleWords])];
-
-let result=[];
-while(result.length<45 && pool.length>0){
-const r=Math.floor(Math.random()*pool.length);
-result.push(pool[r]);
-pool.splice(r,1);
-}
-return result;
+function generateTitle(category,index){
+return category+" Premium Graphic Design "+(index+1);
 }
 
-async function uploadVector(){
-
-const user=document.getElementById("github-user").value.trim();
-const repo=document.getElementById("github-repo").value.trim();
-const token=document.getElementById("github-token").value.trim();
-const image=document.getElementById("image-url").value.trim();
-const title=document.getElementById("title").value.trim();
-
-if(!user||!repo||!token||!image||!title){
-alert("All fields required");
-return;
+function generateKeywords(category){
+let base = category.split("/")[0].toLowerCase();
+let keywords=[];
+for(let i=1;i<=45;i++){
+keywords.push(base+" keyword"+i);
+}
+return keywords;
 }
 
-const category=detectCategory(title);
-const keywords=generateKeywords(title,category);
+function generateJSON(){
+let jpeg = document.getElementById("jpegInput").value.trim().split("\n");
+let eps = document.getElementById("epsInput").value.trim().split("\n");
 
-const newVector={
-title:title,
+let data=[];
+
+jpeg.forEach((file,i)=>{
+let clean = cleanName(file);
+let category = detectCategory(clean);
+data.push({
+id:i+1,
+title:generateTitle(category,i),
 category:category,
-image:image,
-keywords:keywords
-};
-
-const apiURL=`https://api.github.com/repos/${user}/${repo}/contents/admin.json`;
-
-let sha=null;
-let existingData={vectors:[]};
-
-const getFile=await fetch(apiURL,{
-headers:{Authorization:`token ${token}`}
+jpeg:clean,
+eps:clean.replace(".jpg",".eps"),
+keywords:generateKeywords(category)
+});
 });
 
-if(getFile.status===200){
-const fileData=await getFile.json();
-sha=fileData.sha;
-existingData=JSON.parse(atob(fileData.content));
-
-if(existingData.vectors.some(v=>v.title===title)){
-log("❌ Same title already exists!");
-return;
-}
-}
-
-existingData.vectors.push(newVector);
-
-const updatedContent=btoa(JSON.stringify(existingData,null,2));
-
-const response=await fetch(apiURL,{
-method:"PUT",
-headers:{
-Authorization:`token ${token}`,
-"Content-Type":"application/json"
-},
-body:JSON.stringify({
-message:"Add new vector",
-content:updatedContent,
-sha:sha
-})
-});
-
-if(response.status===200||response.status===201){
-log("✅ Upload Successful!");
-}else{
-log("❌ Upload Failed!");
-}
-
+document.getElementById("output").innerText = JSON.stringify(data,null,2);
+localStorage.setItem("assetsData",JSON.stringify(data));
+alert("Data saved to localStorage.");
 }
 
 </script>
+
 </body>
 </html>
