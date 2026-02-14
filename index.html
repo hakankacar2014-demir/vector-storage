@@ -3,98 +3,175 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FREE VECTOR STOCK - Admin</title>
+<title>FREE VECTOR STOCK - Free Vector Download</title>
+<meta name="description" content="Download free vectors, EPS10, SVG and JPEG graphics for personal and commercial use. High quality free vector stock platform.">
+<meta name="keywords" content="free vector download, free eps10, free svg, free stock graphics, free vector stock">
+<link rel="icon" href="#">
+
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
 
 <style>
-body{margin:0;font-family:Arial;background:#ffffff;}
-header{background:#000;color:#fff;text-align:center;padding:20px;font-size:24px;font-weight:bold;}
-.container{max-width:1200px;margin:auto;padding:30px;}
-input,button{width:100%;padding:12px;margin:10px 0;}
-button{background:#000;color:#fff;border:none;cursor:pointer;font-weight:bold;}
+body{margin:0;font-family:Arial;background:white}
+.top{background:black;color:white;text-align:center;padding:25px}
+.logo{font-size:30px;font-weight:bold}
+.lines span{display:inline-block;width:40px;height:3px;background:white;margin:6px;cursor:pointer}
+.slider{margin-top:15px;font-size:14px;max-width:900px;margin-left:auto;margin-right:auto}
+.layout{display:flex}
+.sidebar{width:240px;border-right:1px solid #ddd;padding:20px;height:calc(100vh - 180px);overflow:auto}
+.sidebar div{margin:6px 0;cursor:pointer;font-size:14px}
+.content{flex:1;padding:20px}
+.search{border:1px solid #ccc;padding:10px;display:flex;max-width:400px}
+.search input{border:none;outline:none;flex:1}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:20px;margin-top:20px}
+.card{border:1px solid #ddd;padding:10px}
+.card img{width:100%;height:150px;object-fit:cover}
+.title{font-size:14px;margin:5px 0}
+.keywords{font-size:11px;color:#666}
+.btn{margin-top:8px;background:black;color:white;padding:6px;text-align:center;cursor:pointer}
+.ad{margin:25px 0;height:90px;border:1px dashed #999;display:flex;align-items:center;justify-content:center}
+.bottom{background:black;color:white;padding:20px;display:flex;justify-content:space-between;align-items:center}
+a{color:white;text-decoration:none}
 </style>
 </head>
 <body>
 
-<header>FREE VECTOR STOCK - Admin Panel</header>
-
-<div class="container">
-
-<h2>Bulk Upload (Minimum 50 Recommended)</h2>
-
-<label>Upload JPEG Files</label>
-<input type="file" id="jpegFiles" multiple accept=".jpg,.jpeg">
-
-<label>Upload EPS10 Files</label>
-<input type="file" id="epsFiles" multiple accept=".eps">
-
-<button onclick="uploadFiles()">Process Upload</button>
-
+<div class="top">
+<div class="logo">FREE VECTOR STOCK</div>
+<div class="lines">
+<span onclick="changeText(0)"></span>
+<span onclick="changeText(1)"></span>
+<span onclick="changeText(2)"></span>
+<span onclick="changeText(3)"></span>
+<span onclick="changeText(4)"></span>
+</div>
+<div class="slider" id="sliderText"></div>
 </div>
 
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+<div class="layout">
+<div class="sidebar" id="categories"></div>
+
+<div class="content">
+<div class="search">
+<input type="text" id="searchInput" placeholder="Search vectors..." onkeyup="searchImages()">
+<span>🔍</span>
+</div>
+
+<div class="ad">AD AREA</div>
+<div class="gallery" id="gallery"></div>
+<div class="ad">AD AREA</div>
+
+</div>
+</div>
+
+<div class="bottom">
+<div>
+Visitors: <span id="visitors">0</span> |
+Downloads: <span id="downloads">0</span>
+</div>
+<div>
+© 2026 ® Registered Trademark |
+<a href="mailto:hakankacar2014@gmail.com">Info</a>
+</div>
+</div>
 
 <script>
-const firebaseConfig={
-apiKey:"YOUR_KEY",
-authDomain:"YOUR_DOMAIN",
-projectId:"YOUR_PROJECT_ID"
-};
-
+const firebaseConfig = YOUR_FIREBASE_CONFIG_HERE;
 firebase.initializeApp(firebaseConfig);
-const db=firebase.firestore();
+const db = firebase.firestore();
+const storage = firebase.storage();
 
-function cleanName(name){
-return name.toLowerCase().replace(/[^a-z0-9]/g,"-");
-}
-
-function detectCategory(name){
-const cats=[
-"abstract","animals","arts","backgrounds","beauty","buildings","business","celebrities",
-"education","food","healthcare","holidays","industrial","interiors","miscellaneous",
-"nature","objects","parks","people","religion","science","signs","sports",
-"technology","transportation","vintage"
+const texts=[
+"We operate our own in-house studio to produce graphic designs and offer them free of charge for both personal and commercial projects.",
+"Our goal is to provide a comprehensive and ideal platform for those seeking graphic resources.",
+"We aim to offer a wide archive of graphics, including vector illustrations, stock photos, icons, logos, and various design elements.",
+"Our only and absolute rule is that our files may not be redistributed in any way.",
+"The advertisements on our website generate revenue to enable us to continue our work. Therefore, we ask for your understanding."
 ];
-for(let c of cats){if(name.includes(c)) return c;}
-return "miscellaneous";
+document.getElementById("sliderText").innerText=texts[0];
+function changeText(i){document.getElementById("sliderText").innerText=texts[i]}
+
+const categoryList=[
+"Abstract","Animals/Wildlife","The Arts","Backgrounds/Textures","Beauty/Fashion","Buildings/Landmarks",
+"Business/Finance","Celebrities","Education","Food and Drink","Healthcare/Medical","Holidays",
+"Industrial","Interiors","Miscellaneous","Nature","Objects","Parks/Outdoor","People","Religion",
+"Science","Signs/Symbols","Sports/Recreation","Technology","Transportation","Vintage"
+];
+
+const catDiv=document.getElementById("categories");
+categoryList.sort().forEach(cat=>{
+let d=document.createElement("div");
+d.innerText=cat;
+d.onclick=()=>loadCategory(cat);
+catDiv.appendChild(d);
+});
+
+const counterRef=db.collection("global").doc("counters");
+counterRef.get().then(doc=>{
+if(!doc.exists){
+counterRef.set({visitors:1,downloads:0});
+document.getElementById("visitors").innerText=1;
+}else{
+let v=doc.data().visitors+1;
+counterRef.update({visitors:v});
+document.getElementById("visitors").innerText=v;
+document.getElementById("downloads").innerText=doc.data().downloads;
 }
+});
 
-function generateTitle(base){
-return base.replace(/-/g," ").replace(/\b\w/g,l=>l.toUpperCase());
-}
-
-function generateKeywords(base){
-let arr=base.split("-");
-while(arr.length<45){arr.push("vector");}
-return arr.slice(0,45);
-}
-
-async function uploadFiles(){
-const jpegs=document.getElementById("jpegFiles").files;
-const eps=document.getElementById("epsFiles").files;
-
-if(jpegs.length===0||eps.length===0){
-alert("Upload both JPEG and EPS files.");
-return;
-}
-
-for(let i=0;i<jpegs.length;i++){
-let base=cleanName(jpegs[i].name.split(".")[0]);
-let category=detectCategory(base);
-
-await db.collection("vectors").add({
-title:generateTitle(base)+" "+Date.now(),
-category:category,
-jpeg:"images/"+jpegs[i].name,
-eps:"images/"+eps[i].name,
-keywords:generateKeywords(base),
-date:Date.now()
+function loadCategory(cat){
+db.collection("images").where("categories","array-contains",cat).get().then(snap=>{
+renderImages(snap);
 });
 }
 
-alert("Upload Completed Successfully.");
+function searchImages(){
+let q=document.getElementById("searchInput").value.toLowerCase();
+db.collection("images").get().then(snap=>{
+let filtered=snap.docs.filter(d=>d.data().title.toLowerCase().includes(q));
+renderImages({docs:filtered});
+});
+}
+
+function renderImages(snapshot){
+let g=document.getElementById("gallery");
+g.innerHTML="";
+snapshot.docs.forEach(doc=>{
+let data=doc.data();
+let card=document.createElement("div");
+card.className="card";
+card.innerHTML=`
+<img src="${data.jpeg}">
+<div class="title">${data.title}</div>
+<div class="keywords">${data.keywords.join(", ")}</div>
+<div class="btn" onclick="openDownload('${doc.id}')">Download</div>
+`;
+g.appendChild(card);
+});
+}
+
+function openDownload(id){
+db.collection("images").doc(id).get().then(doc=>{
+let data=doc.data();
+let w=window.open("");
+w.document.write(`
+<html><body style="font-family:Arial;background:white;text-align:center">
+<div style="background:black;color:white;padding:20px">FREE VECTOR STOCK</div>
+<div style="margin:30px">
+<img src="${data.jpeg}" style="max-width:500px"><br><br>
+<a href="${data.jpeg}" download><button>Download JPEG</button></a>
+<a href="${data.eps}" download><button>Download EPS10</button></a>
+<a href="${data.svg}" download><button>Download SVG</button></a>
+<div style="margin-top:30px;height:90px;border:1px dashed #999;display:flex;align-items:center;justify-content:center">AD AREA</div>
+</div>
+</body></html>
+`);
+counterRef.get().then(d=>{
+counterRef.update({downloads:d.data().downloads+1});
+});
+});
 }
 </script>
-
 </body>
 </html>
